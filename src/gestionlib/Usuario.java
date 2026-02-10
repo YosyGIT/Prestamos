@@ -1,47 +1,43 @@
 package gestionlib;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 public class Usuario {
     private String nombre;
     private String email;
-    private String regEmail = "[A-Za-z0-9]+@[a-z0-9].(com|es)";
+    private static final String regEmail = "[A-Za-z0-9]+@[a-z0-9]+\\.(com|es)";
     private String numeroSocio;
-    private String regNumSocio = "SOC";
+    private static final String regNumSocio = "SOC[0-9]{5}";
     private LocalDate fechaRegistro;
     private boolean sancionado;
     private LocalDate fechaFinSancion;
-    private static int nSocio = 1;
 
-    public Usuario(String nombre, String email, LocalDate fechaRegistro) throws UsuarioInvalidoException {
+    public Usuario(String nombre, String email, String numeroSocio, LocalDate fechaRegistro) throws UsuarioInvalidoException {
+        if (!email.matches(this.regEmail)){
+            throw new UsuarioInvalidoException("::ERROR:: El formato del correo es incorrecto.");
+        }
+        this.email = email;
         this.nombre = nombre;
 
-        if (email.matches(this.regEmail)){
-            this.email = email;
-        }else {
-            throw new UsuarioInvalidoException("::ERROR:: El correo no cumple con los requisitos.");
+        if (!numeroSocio.matches(regNumSocio)){
+            throw new UsuarioInvalidoException("::ERROR:: El formato del número de socio es incorrecto.")
         }
-
-        if (nSocio < 10){
-            this.numeroSocio = regNumSocio + "0000" + nSocio;
-        } else if (nSocio < 100) {
-            this.numeroSocio = regNumSocio + "000" + nSocio;
-        } else if (nSocio < 1000) {
-            this.numeroSocio = regNumSocio + "00" + nSocio;
-        } else if (nSocio < 10000) {
-            this.numeroSocio = regNumSocio + nSocio;
-        } else if (nSocio == 99999) {
-            throw new UsuarioInvalidoException("::ERROR:: Limite de usuarios alcanzado.");
-        }
-        nSocio++;
-
+        this.numeroSocio = numeroSocio;
         this.fechaRegistro = fechaRegistro;
     }
 
-    public void sancionar(int tiempoSancion, LocalDate inicio){
+    public void sancionar(int tiempoSancion, LocalDate inicio) throws UsuarioInvalidoException{
+        if (sancionado){
+            throw new UsuarioInvalidoException("::ERROR:: El usuario ya tiene una sancion");
+        }
         this.sancionado = true;
         this.fechaFinSancion = inicio.plusDays(tiempoSancion);
     }
 
-    public void levantarSancion(){
+    public void levantarSancion() throws UsuarioInvalidoException{
+        if (!sancionado){
+            throw new UsuarioInvalidoException("::ERROR:: El usuario no tiene ninguna sancion");
+        }
         this.sancionado = false;
         this.fechaFinSancion = null;
     }
@@ -52,6 +48,10 @@ public class Usuario {
 
     @Override
     public String toString(){
-        return "";
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return String.format("NOMBRE: " + this.nombre +
+                "\nEMAIL: " + this.email +
+                "\nNºSOCIO: " + this.numeroSocio +
+                "\nFECHA DE REGISTRO: " + this.fechaRegistro.format(formato));
     }
 }
