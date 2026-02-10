@@ -20,10 +20,14 @@ public class Usuario {
         this.nombre = nombre;
 
         if (!numeroSocio.matches(regNumSocio)){
-            throw new UsuarioInvalidoException("::ERROR:: El formato del número de socio es incorrecto.")
+            throw new UsuarioInvalidoException("::ERROR:: El formato del número de socio es incorrecto.");
         }
         this.numeroSocio = numeroSocio;
         this.fechaRegistro = fechaRegistro;
+    }
+
+    public String getNombre() {
+        return nombre;
     }
 
     public void sancionar(int tiempoSancion, LocalDate inicio) throws UsuarioInvalidoException{
