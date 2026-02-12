@@ -13,6 +13,14 @@ public class GestorBiblioteca {
         this.prestamos = new Prestamo[MAX_PRESTAMOS];
     }
 
+    public Prestamo[] getPrestamos() {
+        return prestamos;
+    }
+
+    public Usuario[] getUsuarios() {
+        return usuarios;
+    }
+
     public void registrarUsuario(Usuario socio) throws UsuarioRepetidoException{
         for (int i = 0; i <= numeroUsuarios; i++){
             if (socio.equals(this.usuarios)){
@@ -47,19 +55,23 @@ public class GestorBiblioteca {
         }
     }
 
-    public boolean devolverLibro(String codigoLibro, LocalDate fechaDevolucion) throws PrestamoInvalidoException{
-        int diasRetraso;
+    public boolean devolverLibro(String codigoLibro, LocalDate fechaDevolucion) throws PrestamoInvalidoException, UsuarioInvalidoException {
         for (Prestamo p : prestamos){
             if (p.getCodigoLibro().equals(codigoLibro) && fechaDevolucion.isBefore(p.getFechaPrestamo())){
                 throw new PrestamoInvalidoException("::ERROR:: La fecha de devolucion es anterior a la del prestamo.");
             }
             if (p.getCodigoLibro().equals(codigoLibro)){
                 if (p.estaRetrasado()){
-                    diasRetraso = p.calcularDiasRetraso();
+                    p.registrarDevolucion(LocalDate.now());
+                    p.getSocio().sancionar(p.calcularDiasRetraso(), LocalDate.now());
+                    return true;
+                } else{
+                    p.registrarDevolucion(LocalDate.now());
+                    return true;
                 }
             }
         }
-
+        return false;
     }
 
     public Usuario buscarSocio(String codigoSocio){
@@ -69,5 +81,24 @@ public class GestorBiblioteca {
             }
         }
         return null;
+    }
+
+    @Override
+    public String toString(){
+        String respuesta = "-::USUARIOS::-";
+        for (Usuario u : usuarios){
+            if (u != null){
+                respuesta += "\n" + u.toString() + "\n";
+            }
+        }
+
+        respuesta += "\n-::PRESTAMOS::-";
+        for (Prestamo p : prestamos){
+            if (p != null){
+                respuesta += "\n" + p.toString() + "\n";
+            }
+        }
+
+        return respuesta;
     }
 }
