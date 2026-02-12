@@ -28,14 +28,46 @@ public class GestorBiblioteca {
     }
 
     public void realizarPrestamo(String codigoLibro, String tituloLibro, LocalDate fechaPrestamo, Usuario socio)
-                                    throws PrestamoInvalidoException, UsuarioRepetidoException, LibroNoDisponibleException{
-        final String regCodigoLibro = "LIB[0-9]{4}";
-        if (!codigoLibro.matches(regCodigoLibro)){
-            throw new PrestamoInvalidoException("::ERROR:: El formato del codigo del libro es incorrecto.");
+                                    throws PrestamoInvalidoException, UsuarioSacionadoException, LibroNoDisponibleException{
+        if (socio.estaSancionado()){
+            throw new UsuarioSacionadoException("::ERROR:: El usuario no puede realizar prestamos con una sanción en curso.");
+        }
+        for (Prestamo p : prestamos){
+            if (p.getTituloLibro().equalsIgnoreCase(tituloLibro.trim()) && p.getFechaDevolucionReal() == null){
+                throw new LibroNoDisponibleException("::ERROR:: El libro no esta disponible");
+            }
+        }
+        if (numeroPrestamos == MAX_PRESTAMOS){
+            throw new PrestamoInvalidoException("::ERROR:: No se pueden realizar más prestamos.");
+        }
+        for (int i = 0; i <= numeroPrestamos + 1; i++){
+            if (prestamos[i] != null){
+                prestamos[i] = new Prestamo(codigoLibro, socio, tituloLibro, fechaPrestamo);
+            }
+        }
+    }
+
+    public boolean devolverLibro(String codigoLibro, LocalDate fechaDevolucion) throws PrestamoInvalidoException{
+        int diasRetraso;
+        for (Prestamo p : prestamos){
+            if (p.getCodigoLibro().equals(codigoLibro) && fechaDevolucion.isBefore(p.getFechaPrestamo())){
+                throw new PrestamoInvalidoException("::ERROR:: La fecha de devolucion es anterior a la del prestamo.");
+            }
+            if (p.getCodigoLibro().equals(codigoLibro)){
+                if (p.estaRetrasado()){
+                    diasRetraso = p.calcularDiasRetraso();
+                }
+            }
         }
 
-        if (tituloLibro.trim().isEmpty()){
-            throw new PrestamoInvalidoException("::ERROR:: No puede ser un campo vacio.");
+    }
+
+    public Usuario buscarSocio(String codigoSocio){
+        for (int i = 0; i <= numeroUsuarios + 1; i++){
+            if (usuarios[i].getNumeroSocio().equals(codigoSocio)){
+                return usuarios[i];
+            }
         }
+        return null;
     }
 }

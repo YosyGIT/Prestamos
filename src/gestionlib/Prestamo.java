@@ -27,7 +27,7 @@ public class Prestamo {
         if (tituloLibro.trim().isEmpty()){
             throw new PrestamoInvalidoException("::ERROR:: No puede ser un campo vacio.");
         }
-        this.tituloLibro = tituloLibro;
+        this.tituloLibro = tituloLibro.trim();
 
         if (fechaPrestamo == null){
             throw new PrestamoInvalidoException("::ERROR:: La fecha de prestamo no puede ser un campo vacio.");
@@ -37,6 +37,26 @@ public class Prestamo {
         }
         this.fechaPrestamo = fechaPrestamo;
         this.fechaDevolucionPrevista = this.fechaPrestamo.plusDays(14);
+    }
+
+    public String getTituloLibro() {
+        return tituloLibro;
+    }
+
+    public String getCodigoLibro() {
+        return codigoLibro;
+    }
+
+    public LocalDate getFechaPrestamo() {
+        return fechaPrestamo;
+    }
+
+    public LocalDate getFechaDevolucionReal() {
+        return fechaDevolucionReal;
+    }
+
+    public Usuario getSocio() {
+        return socio;
     }
 
     public void registrarDevolucion(LocalDate fechaDev) throws PrestamoInvalidoException{

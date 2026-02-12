@@ -30,6 +30,10 @@ public class Usuario {
         return nombre;
     }
 
+    public String getNumeroSocio(){
+        return numeroSocio;
+    }
+
     public void sancionar(int tiempoSancion, LocalDate inicio) throws UsuarioInvalidoException{
         if (sancionado){
             throw new UsuarioInvalidoException("::ERROR:: El usuario ya tiene una sancion");
