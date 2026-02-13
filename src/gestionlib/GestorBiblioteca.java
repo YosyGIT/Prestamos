@@ -22,17 +22,19 @@ public class GestorBiblioteca {
     }
 
     public void registrarUsuario(Usuario socio) throws UsuarioRepetidoException{
-        for (int i = 0; i <= numeroUsuarios; i++){
-            if (socio.equals(this.usuarios)){
-                throw new UsuarioRepetidoException("::ERROR:: El usuario ya se encuntra en la base de datos.");
+        if (numeroUsuarios < MAX_USUARIOS){
+            for (int i = 0; i <= numeroUsuarios; i++){
+                if (socio.equals(this.usuarios[i])){
+                    throw new UsuarioRepetidoException("::ERROR:: El usuario ya se encuntra en la base de datos.");
+                }
             }
+
+            usuarios[numeroUsuarios] = socio;
+            numeroUsuarios++;
+        }else {
+            throw new UsuarioRepetidoException("::ERROR:: Limite de usuarios alcanzado.");
         }
 
-        for (int i = 0; i <= numeroUsuarios + 1; i++){
-            if (this.usuarios[i] == null){
-                this.usuarios[i] = socio;
-            }
-        }
     }
 
     public void realizarPrestamo(String codigoLibro, String tituloLibro, LocalDate fechaPrestamo, Usuario socio)
@@ -48,11 +50,9 @@ public class GestorBiblioteca {
         if (numeroPrestamos == MAX_PRESTAMOS){
             throw new PrestamoInvalidoException("::ERROR:: No se pueden realizar más prestamos.");
         }
-        for (int i = 0; i <= numeroPrestamos + 1; i++){
-            if (prestamos[i] != null){
-                prestamos[i] = new Prestamo(codigoLibro, socio, tituloLibro, fechaPrestamo);
-            }
-        }
+
+        prestamos[numeroPrestamos] = new Prestamo(codigoLibro, socio, tituloLibro, fechaPrestamo);
+        numeroPrestamos++;
     }
 
     public boolean devolverLibro(String codigoLibro, LocalDate fechaDevolucion) throws PrestamoInvalidoException, UsuarioInvalidoException {
@@ -62,11 +62,11 @@ public class GestorBiblioteca {
             }
             if (p.getCodigoLibro().equals(codigoLibro)){
                 if (p.estaRetrasado()){
-                    p.registrarDevolucion(LocalDate.now());
-                    p.getSocio().sancionar(p.calcularDiasRetraso(), LocalDate.now());
+                    p.registrarDevolucion(fechaDevolucion);
+                    p.getSocio().sancionar(p.calcularDiasRetraso(), fechaDevolucion);
                     return true;
                 } else{
-                    p.registrarDevolucion(LocalDate.now());
+                    p.registrarDevolucion(fechaDevolucion);
                     return true;
                 }
             }
@@ -75,7 +75,7 @@ public class GestorBiblioteca {
     }
 
     public Usuario buscarSocio(String codigoSocio){
-        for (int i = 0; i <= numeroUsuarios + 1; i++){
+        for (int i = 0; i <= numeroUsuarios; i++){
             if (usuarios[i].getNumeroSocio().equals(codigoSocio)){
                 return usuarios[i];
             }

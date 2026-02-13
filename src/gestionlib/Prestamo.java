@@ -82,7 +82,7 @@ public class Prestamo {
     }
 
     public boolean estaRetrasado(){
-        return this.fechaDevolucionPrevista.isAfter(LocalDate.now());
+        return this.fechaDevolucionPrevista.isAfter(LocalDate.now()) && this.fechaDevolucionReal == null;
     }
 
     @Override
