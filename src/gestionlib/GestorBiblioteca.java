@@ -75,7 +75,7 @@ public class GestorBiblioteca {
     }
 
     public Usuario buscarSocio(String codigoSocio){
-        for (int i = 0; i <= numeroUsuarios; i++){
+        for (int i = 0; i < numeroUsuarios; i++){
             if (usuarios[i].getNumeroSocio().equals(codigoSocio)){
                 return usuarios[i];
             }

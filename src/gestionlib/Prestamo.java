@@ -51,6 +51,10 @@ public class Prestamo {
         return fechaPrestamo;
     }
 
+    public LocalDate getFechaDevolucionPrevista() {
+        return fechaDevolucionPrevista;
+    }
+
     public LocalDate getFechaDevolucionReal() {
         return fechaDevolucionReal;
     }

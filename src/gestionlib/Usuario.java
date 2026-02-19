@@ -34,6 +34,10 @@ public class Usuario {
         return numeroSocio;
     }
 
+    public LocalDate getFechaFinSancion() {
+        return fechaFinSancion;
+    }
+
     public void sancionar(int tiempoSancion, LocalDate inicio) throws UsuarioInvalidoException{
         if (sancionado){
             throw new UsuarioInvalidoException("::ERROR:: El usuario ya tiene una sancion");

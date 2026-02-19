@@ -1,6 +1,7 @@
 package gestionlib;
 import java.net.SocketImpl;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 public class AppBiblioteca {
     public static void main(String[] args) {
@@ -9,7 +10,7 @@ public class AppBiblioteca {
         int opcion = -1;
 
         while(opcion != 8){
-            System.out.println("1. Registar nuevo usuario");
+            System.out.println("\n1. Registar nuevo usuario");
             System.out.println("2. Realizar préstamo de libro");
             System.out.println("3. Devolver libro");
             System.out.println("4. Consultar estado de usuario");
@@ -19,6 +20,7 @@ public class AppBiblioteca {
             System.out.println("8. Salir");
             System.out.print("-> ");
             opcion = sc.nextInt();
+            sc.nextLine();
 
             switch (opcion){
                 case 1:
@@ -66,6 +68,23 @@ public class AppBiblioteca {
                         sc.nextLine();
                     }
                 break;
+
+                case 6:
+                    try{
+                        System.out.println(mostrarSancionados(gestor1));
+                    } catch (UsuarioSacionadoException e) {
+                        System.out.println(e.getMessage());
+                        sc.nextLine();
+                    }
+                break;
+
+                case 7:
+                    try{
+                        actualizarSanciones(gestor1);
+                    } catch (UsuarioInvalidoException | UsuarioSacionadoException e) {
+                        System.out.println(e.getMessage());
+                        sc.nextLine();
+                    }
             }
         }
     }
@@ -77,11 +96,11 @@ public class AppBiblioteca {
 
         System.out.print("\nIntroduce el nombre: ");
         nombre = sc.nextLine();
-        System.out.print("\nIntroduce el email: ");
+        System.out.print("Introduce el email: ");
         email = sc.nextLine();
-        System.out.print("\nIntroduce el numero de socio (EJEMPLO: SOC0000):");
+        System.out.print("Introduce el numero de socio (EJEMPLO: SOC00000):");
         numeroSocio = sc.nextLine();
-        System.out.print("\nIntroduce la fechaRegistroUsr de registro (EJEMPLO: 23/04/2026)");
+        System.out.print("Introduce la fecha de registro (EJEMPLO: 23/04/2026): ");
         fechaRegistroUsr = sc.nextLine();
 
 
@@ -129,14 +148,36 @@ public class AppBiblioteca {
                         throws PrestamoInvalidoException, UsuarioInvalidoException, FormatoInvalidoException{
         String codigoLibro, fechaDevolucion;
 
+        boolean exito;
+        Usuario socio;
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate fecha;
+
         System.out.print("\nIntroduce el codigo del libro: ");
         codigoLibro = sc.nextLine();
         System.out.print("\nIntroduce la fecha de devolucion: ");
         fechaDevolucion = sc.nextLine();
+        fecha = formatoFecha(fechaDevolucion);
 
-        g.devolverLibro(codigoLibro, formatoFecha(fechaDevolucion));
+        exito = g.devolverLibro(codigoLibro, fecha);
 
-        return "";
+        if (exito){
+            for (Prestamo p : g.getPrestamos()){
+                if (p != null && p.getCodigoLibro().equalsIgnoreCase(codigoLibro) && p.getFechaDevolucionPrevista().equals(fecha)){
+                    if (p.calcularDiasRetraso() > 0){
+                        socio = p.getSocio();
+                        return "Devolución registrada con " + p.calcularDiasRetraso() + " días de retraso" +
+                                "\nUsuario sancionador por " + p.calcularDiasRetraso() + " días (hasta el " +
+                                socio.getFechaFinSancion().format(formato) + ")";
+                    } else {
+                        return "Deolucion realizada con exito y a tiempo.";
+                    }
+
+                }
+            }
+        }
+
+        return "No se ha encontrado ninguna devolución pendiente.";
     }
 
     public static boolean estadoUsuario(Scanner sc, GestorBiblioteca g) throws UsuarioInvalidoException{
@@ -160,7 +201,7 @@ public class AppBiblioteca {
     public static String mostrarPrestamos(GestorBiblioteca g) throws PrestamoInvalidoException{
         String prestamos = "";
         for (Prestamo p : g.getPrestamos()){
-            if (p != null){
+            if (p != null && p.getFechaDevolucionReal() == null){
                 prestamos += "\n" + p.toString();
             }
         }
@@ -170,5 +211,33 @@ public class AppBiblioteca {
         return prestamos;
     }
 
+    public static String mostrarSancionados (GestorBiblioteca g) throws UsuarioSacionadoException{
+        String sancionados = "";
+        for (Usuario u : g.getUsuarios()){
+            if (u != null && u.estaSancionado()){
+                sancionados += "\n" + u.toString();
+            }
+        }
+        if (sancionados.isEmpty()){
+            throw new UsuarioSacionadoException("::ERROR:: No hay usuarios sancionados.");
+        }
+        return sancionados;
+    }
+
+    public static void actualizarSanciones (GestorBiblioteca g) throws UsuarioInvalidoException, UsuarioSacionadoException {
+        int contadorActualizaciones = 0;
+        for (Usuario u : g.getUsuarios()){
+            if (u != null && u.getFechaFinSancion() != null && u.getFechaFinSancion().isBefore(LocalDate.now())){
+                u.levantarSancion();
+                contadorActualizaciones++;
+            }
+        }
+
+        if (contadorActualizaciones == 0){
+            throw new UsuarioSacionadoException("::ERROR:: No hay usuarios sancionados para actulizar su sancion");
+        }else {
+            System.out.println("\nSanciones actulizadas con exito.");
+        }
+    }
 
 }
