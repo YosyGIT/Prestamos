@@ -43,7 +43,7 @@ public class GestorBiblioteca {
             throw new UsuarioSacionadoException("::ERROR:: El usuario no puede realizar prestamos con una sanción en curso.");
         }
         for (Prestamo p : prestamos){
-            if (p.getTituloLibro().equalsIgnoreCase(tituloLibro.trim()) && p.getFechaDevolucionReal() == null){
+            if (p != null && p.getTituloLibro().equalsIgnoreCase(tituloLibro.trim()) && p.getFechaDevolucionReal() == null){
                 throw new LibroNoDisponibleException("::ERROR:: El libro no esta disponible");
             }
         }

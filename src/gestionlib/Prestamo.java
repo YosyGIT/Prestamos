@@ -94,10 +94,10 @@ public class Prestamo {
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return "\t-::DATOS DEL PRESTAMO::-" +
                 "\nSOCIO [" + this.socio.getNombre() + "]" +
-                "\nTITULO DEL LIBRO: [" + this.tituloLibro + "]\t| CODIGO DEL LIBRO: " + this.codigoLibro +
-                "\nFECHA DEL PRESTAMO: [" + this.fechaPrestamo.format(formato) + "]\t| FECHA DE DEVOLUCION PREVISTA: " +
+                "\nTITULO DEL LIBRO: " + this.tituloLibro + "\t| CODIGO DEL LIBRO: " + this.codigoLibro +
+                "\nFECHA DEL PRESTAMO: " + this.fechaPrestamo.format(formato) + "\t| FECHA DE DEVOLUCION PREVISTA: " +
                 this.fechaDevolucionPrevista.format(formato) +
-                "\nFECHA DE DEVOLUCION: " + this.fechaDevolucionReal.format(formato) + "\t| RETRASO: " +
-                (estaRetrasado()?calcularDiasRetraso() + " días.":"No hay retraso.");
+                "\nFECHA DE DEVOLUCION: " + (this.fechaDevolucionReal!=null?this.fechaDevolucionReal.format(formato):"No se ha devuelto aún") +
+                "\t| RETRASO: " + (estaRetrasado()?calcularDiasRetraso() + " días.":"No hay retraso.");
     }
 }
