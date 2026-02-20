@@ -22,8 +22,8 @@ public class AppBiblioteca {
             System.out.println("2. Realizar préstamo de libro");
             System.out.println("3. Devolver libro");
             System.out.println("4. Consultar estado de usuario");
-            System.out.println("5. Mostrar préstamo activo");
-            System.out.println("6. Mostrar usuario sancionados");
+            System.out.println("5. Mostrar prestamo activo");
+            System.out.println("6. Mostrar usuarios sancionados");
             System.out.println("7. Actualizar sanciones");
             System.out.println("8. Salir");
             System.out.print("-> ");

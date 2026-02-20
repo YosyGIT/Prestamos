@@ -44,7 +44,7 @@ public class Prestamo {
         if (fechaPrestamo == null){
             throw new PrestamoInvalidoException("::ERROR:: La fecha de prestamo no puede ser un campo vacio.");
         }
-        if (fechaPrestamo.isAfter(LocalDate.now())){
+        if (fechaPrestamo.isBefore(LocalDate.now())){
             throw new PrestamoInvalidoException("::ERROR:: La fecha debe ser anterior o igual al día de hoy");
         }
         this.fechaPrestamo = fechaPrestamo;

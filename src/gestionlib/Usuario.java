@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 public class Usuario {
     private String nombre;
     private String email;
-    private static final String regEmail = "[A-Za-z0-9]+@[a-z0-9]+\\.(com|es)";
+    private static final String regEmail = "[A-Za-z0-9]+@[a-z0-9]+\\.(com|es|COM|ES)";
     private String numeroSocio;
     private static final String regNumSocio = "SOC[0-9]{5}";
     private LocalDate fechaRegistro;
@@ -59,8 +59,8 @@ public class Usuario {
 
     /**
      * Metodo que permite sancionar al usuario, comprueba si el usuario ya tiene una sancion
-     * @param tiempoSancion Tiempo
-     * @param inicio
+     * @param tiempoSancion Tiempo de sancion que deseamos darle
+     * @param inicio Fecha de inicio de la sanción
      *     EXCEPCIONES DEL METODO:
      * @throws UsuarioInvalidoException
      */
@@ -72,6 +72,11 @@ public class Usuario {
         this.fechaFinSancion = inicio.plusDays(tiempoSancion);
     }
 
+    /**
+     * Metodo que permite levantar una sancion, en caso de no tener el usuario ninguna sanción lanzara una excepción
+     *     EXCEPCIONES DEL METODO:
+     * @throws UsuarioInvalidoException
+     */
     public void levantarSancion() throws UsuarioInvalidoException{
         if (!sancionado){
             throw new UsuarioInvalidoException("::ERROR:: El usuario no tiene ninguna sancion");
@@ -80,10 +85,18 @@ public class Usuario {
         this.fechaFinSancion = null;
     }
 
+    /**
+     * Metodo que permite comprobar si el usuario esta sancionado
+     * @return Devuelve true en caso de estar sancionado y false en caso de no estarlo
+     */
     public boolean estaSancionado(){
         return sancionado;
     }
 
+    /**
+     * Metodo toString personalizado con los datos del usuario
+     * @return Devuelve una cadena de texto con todos sus datos
+     */
     @Override
     public String toString(){
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
