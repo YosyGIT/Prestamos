@@ -3,6 +3,10 @@ import java.net.SocketImpl;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
+
+/**
+ * @author YosyGIT
+ */
 public class AppBiblioteca {
     /**
      * Metodo principal (main) en el que se encuentra el gestor principal con el que manipulamos

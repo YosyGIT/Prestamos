@@ -2,6 +2,9 @@ package gestionlib;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * @author YosyGIT
+ */
 public class Usuario {
     private String nombre;
     private String email;
@@ -12,8 +15,20 @@ public class Usuario {
     private boolean sancionado;
     private LocalDate fechaFinSancion;
 
+    /**
+     * Constructor que crea al usuario comprobando el formato del email y el numero de socio
+     * @param nombre Nombre del socio
+     * @param email Email del socio
+     * @param numeroSocio Numero de socio
+     * @param fechaRegistro Fecha de registro
+     *     EXCEPCIONES DEL METODO:
+     * @throws UsuarioInvalidoException
+     */
     public Usuario(String nombre, String email, String numeroSocio, LocalDate fechaRegistro) throws UsuarioInvalidoException {
-        if (!email.matches(this.regEmail)){
+        if (!email.matches(regEmail) && !numeroSocio.matches(regNumSocio)){
+            throw new UsuarioInvalidoException("::ERROR:: El formato del email y el numero de socio son incorrectos.");
+        }
+        if (!email.matches(regEmail)){
             throw new UsuarioInvalidoException("::ERROR:: El formato del correo es incorrecto.");
         }
         this.email = email;
@@ -26,6 +41,10 @@ public class Usuario {
         this.fechaRegistro = fechaRegistro;
     }
 
+    /**
+     * Metodos get para poder llamar a los datos de la clase
+     * @return Devuelven el dato que quieras obtener
+     */
     public String getNombre() {
         return nombre;
     }
@@ -38,6 +57,13 @@ public class Usuario {
         return fechaFinSancion;
     }
 
+    /**
+     * Metodo que permite sancionar al usuario, comprueba si el usuario ya tiene una sancion
+     * @param tiempoSancion Tiempo
+     * @param inicio
+     *     EXCEPCIONES DEL METODO:
+     * @throws UsuarioInvalidoException
+     */
     public void sancionar(int tiempoSancion, LocalDate inicio) throws UsuarioInvalidoException{
         if (sancionado){
             throw new UsuarioInvalidoException("::ERROR:: El usuario ya tiene una sancion");

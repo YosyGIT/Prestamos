@@ -3,6 +3,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
+/**
+ * @author YosyGIT
+ */
 public class Prestamo {
     private String codigoLibro;
     private static final String regCodigoLibro = "LIB[0-9]{4}";
@@ -12,6 +15,15 @@ public class Prestamo {
     private LocalDate fechaDevolucionPrevista;
     private LocalDate fechaDevolucionReal;
 
+    /**
+     * Constructor que obliga a crear un objeto de tipo Prestamo con parametros y captura posibles errores
+     * @param codigoLibro Codigo del libro con formato expecifico
+     * @param socio Usuario que debe ser creado desde el menu
+     * @param tituloLibro Titulo del libro
+     * @param fechaPrestamo Fecha del prestamo que debe ser anterior o igual al día actual
+     *     EXCEPCIONES DEL METODO:
+     * @throws PrestamoInvalidoException
+     */
     public Prestamo (String codigoLibro, Usuario socio, String tituloLibro, LocalDate fechaPrestamo)
                     throws PrestamoInvalidoException {
         if (!codigoLibro.matches(regCodigoLibro)){
@@ -33,12 +45,16 @@ public class Prestamo {
             throw new PrestamoInvalidoException("::ERROR:: La fecha de prestamo no puede ser un campo vacio.");
         }
         if (fechaPrestamo.isAfter(LocalDate.now())){
-            throw new PrestamoInvalidoException("::ERROR:: La fecha debe ser posterior o igual al día de hoy");
+            throw new PrestamoInvalidoException("::ERROR:: La fecha debe ser anterior o igual al día de hoy");
         }
         this.fechaPrestamo = fechaPrestamo;
         this.fechaDevolucionPrevista = this.fechaPrestamo.plusDays(14);
     }
 
+    /**
+     * Metodos get para poder llamar a los datos de la clase
+     * @return Devuelven el dato que quieras obtener
+     */
     public String getTituloLibro() {
         return tituloLibro;
     }
@@ -63,9 +79,15 @@ public class Prestamo {
         return socio;
     }
 
+    /**
+     * Metodo que permite registrar la entrega del libro
+     * @param fechaDev Se introduce una fecha de devolucion, que debe ser posterior a la fecha del prestamo
+     *     EXCEPCIONES DEL METODO:
+     * @throws PrestamoInvalidoException
+     */
     public void registrarDevolucion(LocalDate fechaDev) throws PrestamoInvalidoException{
         if (fechaDev == null){
-            throw new PrestamoInvalidoException("::ERROR:: La fecha de devolucion no puede ser un campò vacio");
+            throw new PrestamoInvalidoException("::ERROR:: La fecha de devolucion no puede ser un campo vacio");
         }
         if (fechaDev.isBefore(fechaPrestamo)){
             throw new PrestamoInvalidoException("::ERROR:: La fecha de devolucion debe ser anterior a la de prestamo.");
@@ -73,6 +95,10 @@ public class Prestamo {
         this.fechaDevolucionReal = fechaDev;
     }
 
+    /**
+     * Metodo que ayuda a calcular el retraso que tiene la entrega en numero de dias
+     * @return Devuelve un entero con todos los dias de retraso
+     */
     public int calcularDiasRetraso(){
         int dias;
         if (fechaDevolucionReal == null){
@@ -85,10 +111,18 @@ public class Prestamo {
         return dias;
     }
 
+    /**
+     * Metodo que ayuda a saber si la devolucion del libro cuenta con retraso o no
+     * @return Devuelve true o false
+     */
     public boolean estaRetrasado(){
         return this.fechaDevolucionPrevista.isAfter(LocalDate.now()) && this.fechaDevolucionReal == null;
     }
 
+    /**
+     * Metodo toString personalizado que muestra los datos del prestamo
+     * @return Devuelve una cadena de texto con sus datos
+     */
     @Override
     public String toString(){
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
